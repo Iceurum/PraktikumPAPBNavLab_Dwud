@@ -1,4 +1,4 @@
-package com.example.navigationlab.ui.screen
+package com.example.navigationlab.ui.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -25,10 +25,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.navigationlab.R
+import com.example.navigationlab.ui.ui.detail.DetailUiState
 
 @Composable
 fun DetailScreen(
-    studentId: Int,
+    uiState: DetailUiState,
     onOpenProfile: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -55,29 +56,28 @@ fun DetailScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Detail Mahasiswa",
+                text = "Detail Student",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(
-                        text = "Student ID",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "$studentId",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                    uiState.errorMessage?.let { message ->
+                        Text(message)
+                    }
+                    uiState.student?.let { student ->
+                        Text("ID: ${student.id}")
+                        Text("Nama: ${student.name}")
+                        Text("Program: ${student.program}")
+                        Text("Angkatan: ${student.year}")
+                    }
                 }
             }
 

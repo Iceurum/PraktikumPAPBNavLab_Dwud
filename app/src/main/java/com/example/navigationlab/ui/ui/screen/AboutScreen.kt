@@ -1,4 +1,4 @@
-package com.example.navigationlab.ui.screen
+package com.example.navigationlab.ui.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*

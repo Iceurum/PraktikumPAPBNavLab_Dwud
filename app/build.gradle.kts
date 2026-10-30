@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
     implementation("androidx.navigation:navigation-compose:2.9.8")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
