@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -64,40 +65,69 @@ fun DetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+            if (uiState.errorMessage != null) {
+                // State "student tidak ditemukan"
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
                 ) {
-                    uiState.errorMessage?.let { message ->
-                        Text(message)
-                    }
-                    uiState.student?.let { student ->
-                        Text("ID: ${student.id}")
-                        Text("Nama: ${student.name}")
-                        Text("Program: ${student.program}")
-                        Text("Angkatan: ${student.year}")
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Student tidak ditemukan",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Text(
+                            text = "Data mahasiswa dengan ID tersebut tidak tersedia. " +
+                                    "Silakan kembali ke Home dan pilih mahasiswa dari daftar.",
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Button(
+                            onClick = onBack,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Kembali ke Home")
+                        }
                     }
                 }
-            }
+            } else {
+                uiState.student?.let { student ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text("ID: ${student.id}")
+                            Text("Nama: ${student.name}")
+                            Text("Program: ${student.program}")
+                            Text("Angkatan: ${student.year}")
+                        }
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = onOpenProfile,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Buka Profile")
-            }
+                Button(
+                    onClick = onOpenProfile,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Buka Profile")
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedButton(
-                onClick = onBack,
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, Color.White)
-            ) {
-                Text("Kembali", color = Color.White)
+                OutlinedButton(
+                    onClick = onBack,
+                    modifier = Modifier.fillMaxWidth(),
+                    border = BorderStroke(1.dp, Color.White)
+                ) {
+                    Text("Kembali", color = Color.White)
+                }
             }
         }
     }

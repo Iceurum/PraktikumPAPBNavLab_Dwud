@@ -10,7 +10,8 @@ class StudentLocalDataSource {
         Student(2027, "Bima Pratama", "Teknik Informatika", 2026),
         Student(2028, "Citra Lestari", "Teknik Informatika", 2026),
         Student(2029, "Bone Apart", "Teknik Informatika", 2026),
-        Student(2030, "Dis Siapa", "Teknik Informatika", 2026)
+        Student(2030, "Dis Siapa", "Teknik Informatika", 2026),
+        Student(2031, "Who", "Teknik Informatika", 2026)
     )
 
     fun getStudents(): List<Student> = students

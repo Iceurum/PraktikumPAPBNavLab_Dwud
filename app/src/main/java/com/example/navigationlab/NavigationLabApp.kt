@@ -39,7 +39,7 @@ fun NavigationLabApp() {
 
             HomeScreen(
                 uiState = viewModel.uiState,
-                onOpenDetail = { id -> navController.navigate(Routes.detail(id)) },
+                onOpenDetail = { id -> navController.navigate(Routes.detail(999)) },
                 onOpenProfile = { navController.navigate(Routes.PROFILE) },
                 onOpenAbout = { navController.navigate(Routes.ABOUT) }
             )
