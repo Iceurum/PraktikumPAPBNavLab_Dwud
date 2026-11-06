@@ -9,8 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.navigationlab.data.dto.remote.RetrofitClient
+import com.example.navigationlab.data.remote.StudentRemoteDataSource
 import com.example.navigationlab.data.repository.DefaultStudentRepository
-import com.example.navigationlab.data.source.StudentLocalDataSource
 import com.example.navigationlab.ui.ui.detail.DetailViewModel
 import com.example.navigationlab.ui.ui.home.HomeViewModel
 import com.example.navigationlab.ui.ui.screen.AboutScreen
@@ -20,8 +21,12 @@ import com.example.navigationlab.ui.ui.screen.ProfileScreen
 
 @Composable
 fun NavigationLabApp() {
-    val dataSource = remember { StudentLocalDataSource() }
-    val repository = remember { DefaultStudentRepository(dataSource) }
+    val remoteDataSource = remember {
+        StudentRemoteDataSource(RetrofitClient.apiService)
+    }
+    val repository = remember {
+        DefaultStudentRepository(remoteDataSource)
+    }
     val navController = rememberNavController()
 
     NavHost(
@@ -33,15 +38,14 @@ fun NavigationLabApp() {
                 factory = HomeViewModel.factory(repository)
             )
 
-            LaunchedEffect(Unit) {
-                viewModel.loadStudents()
-            }
-
             HomeScreen(
                 uiState = viewModel.uiState,
-                onOpenDetail = { id -> navController.navigate(Routes.detail(999)) },
+                onOpenDetail = { id -> navController.navigate(Routes.detail(id)) },
                 onOpenProfile = { navController.navigate(Routes.PROFILE) },
-                onOpenAbout = { navController.navigate(Routes.ABOUT) }
+                onOpenAbout = { navController.navigate(Routes.ABOUT) },
+                onRetry = viewModel::loadStudents,
+                onSearchQueryChange = viewModel::onSearchQueryChange,
+                onSearch = viewModel::search
             )
         }
 
@@ -63,7 +67,8 @@ fun NavigationLabApp() {
             DetailScreen(
                 uiState = viewModel.uiState,
                 onOpenProfile = { navController.navigate(Routes.PROFILE) },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onRetry = { viewModel.loadStudent(studentId) }
             )
         }
 

@@ -1,20 +1,41 @@
 package com.example.navigationlab.data.repository
 
 import com.example.navigationlab.data.model.Student
-import com.example.navigationlab.data.source.StudentLocalDataSource
-
+import com.example.navigationlab.data.remote.StudentRemoteDataSource
+import com.example.navigationlab.data.remote.dto.toStudent
 interface StudentRepository {
-    fun getStudents(): List<Student>
-    fun getStudentById(id: Int): Student?
+    fun getStudents(callback: (Result<List<Student>>) -> Unit)
+    fun getStudent(id: Int, callback: (Result<Student>) -> Unit)
+    fun searchStudents(query: String, callback: (Result<List<Student>>) -> Unit)
 }
 
 class DefaultStudentRepository(
-    private val dataSource: StudentLocalDataSource
+    private val remoteDataSource: StudentRemoteDataSource
 ) : StudentRepository {
 
-    override fun getStudents(): List<Student> =
-        dataSource.getStudents()
+    override fun getStudents(
+        callback: (Result<List<Student>>) -> Unit
+    ) {
+        remoteDataSource.getStudents { result ->
+            callback(result.map { users -> users.map { it.toStudent() } })
+        }
+    }
 
-    override fun getStudentById(id: Int): Student? =
-        dataSource.getStudentById(id)
+    override fun searchStudents(
+        query: String,
+        callback: (Result<List<Student>>) -> Unit
+    ) {
+        remoteDataSource.searchStudents(query) { result ->
+            callback(result.map { users -> users.map { it.toStudent() } })
+        }
+    }
+
+    override fun getStudent(
+        id: Int,
+        callback: (Result<Student>) -> Unit
+    ) {
+        remoteDataSource.getStudent(id) { result ->
+            callback(result.map { it.toStudent() })
+        }
+    }
 }

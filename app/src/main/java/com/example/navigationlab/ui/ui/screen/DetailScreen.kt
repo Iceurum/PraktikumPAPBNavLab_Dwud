@@ -27,12 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.navigationlab.R
 import com.example.navigationlab.ui.ui.detail.DetailUiState
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun DetailScreen(
     uiState: DetailUiState,
     onOpenProfile: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onRetry: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -65,69 +67,78 @@ fun DetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (uiState.errorMessage != null) {
-                // State "student tidak ditemukan"
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Student tidak ditemukan",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                        Text(
-                            text = "Data mahasiswa dengan ID tersebut tidak tersedia. " +
-                                    "Silakan kembali ke Home dan pilih mahasiswa dari daftar.",
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                        Button(
-                            onClick = onBack,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Kembali ke Home")
-                        }
-                    }
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator(color = Color.White)
                 }
-            } else {
-                uiState.student?.let { student ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+
+                uiState.errorMessage != null -> {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("ID: ${student.id}")
-                            Text("Nama: ${student.name}")
-                            Text("Program: ${student.program}")
-                            Text("Angkatan: ${student.year}")
+                            Text(
+                                text = "Gagal memuat data",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Text(
+                                text = uiState.errorMessage,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Button(
+                                onClick = onRetry,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Coba Lagi")
+                            }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = onOpenProfile,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Buka Profile")
+                else -> {
+                    uiState.student?.let { student ->
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text("ID: ${student.id}")
+                                Text(
+                                    text = student.name,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text("Email: ${student.email}")
+                                Text("University: ${student.university}")
+                            }
+                        }
+                    }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-                OutlinedButton(
-                    onClick = onBack,
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.White)
-                ) {
-                    Text("Kembali", color = Color.White)
-                }
+            Button(
+                onClick = onOpenProfile,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Buka Profile")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier.fillMaxWidth(),
+                border = BorderStroke(1.dp, Color.White)
+            ) {
+                Text("Kembali", color = Color.White)
             }
         }
     }
