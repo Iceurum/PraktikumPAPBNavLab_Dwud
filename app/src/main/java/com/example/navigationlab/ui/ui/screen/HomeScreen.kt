@@ -7,18 +7,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.navigationlab.R
 import com.example.navigationlab.ui.ui.home.HomeUiState
@@ -41,12 +36,13 @@ import com.example.navigationlab.ui.ui.home.HomeUiState
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    searchQuery: String,
     onOpenDetail: (Int) -> Unit,
     onOpenProfile: () -> Unit,
     onOpenAbout: () -> Unit,
     onRetry: () -> Unit,
-    onSearchQueryChange: (String) -> Unit,
-    onSearch: () -> Unit
+    onRefresh: () -> Unit,
+    onSearchQueryChange: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -83,24 +79,23 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Baris pencarian (selalu tampil, di luar when)
-            Row(
+            // Pencarian otomatis (debounce di ViewModel)
+            TextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                placeholder = { Text("Cari nama...") },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onRefresh,
+                enabled = !uiState.isLoading,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                TextField(
-                    value = uiState.searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    modifier = Modifier.weight(1f),
-                    placeholder = { Text("Cari nama...") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onSearch() })
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = onSearch) {
-                    Text("Cari")
-                }
+                Text("Refresh")
             }
 
             Spacer(modifier = Modifier.height(16.dp))

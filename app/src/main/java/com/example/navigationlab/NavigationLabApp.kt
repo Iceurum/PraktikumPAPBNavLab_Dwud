@@ -2,7 +2,9 @@ package com.example.navigationlab
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,15 +39,18 @@ fun NavigationLabApp() {
             val viewModel: HomeViewModel = viewModel(
                 factory = HomeViewModel.factory(repository)
             )
+            val homeUiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
             HomeScreen(
-                uiState = viewModel.uiState,
+                uiState = homeUiState,
+                searchQuery = searchQuery,
                 onOpenDetail = { id -> navController.navigate(Routes.detail(id)) },
                 onOpenProfile = { navController.navigate(Routes.PROFILE) },
                 onOpenAbout = { navController.navigate(Routes.ABOUT) },
-                onRetry = viewModel::loadStudents,
-                onSearchQueryChange = viewModel::onSearchQueryChange,
-                onSearch = viewModel::search
+                onRetry = viewModel::retry,
+                onRefresh = viewModel::refresh,
+                onSearchQueryChange = viewModel::onSearchQueryChange
             )
         }
 
@@ -59,13 +64,14 @@ fun NavigationLabApp() {
             val viewModel: DetailViewModel = viewModel(
                 factory = DetailViewModel.factory(repository)
             )
+            val detailUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(studentId) {
                 viewModel.loadStudent(studentId)
             }
 
             DetailScreen(
-                uiState = viewModel.uiState,
+                uiState = detailUiState,
                 onOpenProfile = { navController.navigate(Routes.PROFILE) },
                 onBack = { navController.popBackStack() },
                 onRetry = { viewModel.loadStudent(studentId) }
