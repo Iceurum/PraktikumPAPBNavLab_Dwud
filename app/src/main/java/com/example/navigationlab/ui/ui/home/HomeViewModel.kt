@@ -5,19 +5,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.navigationlab.data.preferences.UserPreferencesRepository
+import com.example.navigationlab.data.repository.FavoriteRepository
 import com.example.navigationlab.data.repository.StudentRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val repository: StudentRepository
+    private val repository: StudentRepository,
+    private val preferencesRepository: UserPreferencesRepository,
+    private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
@@ -26,12 +34,35 @@ class HomeViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    val favoriteIds: StateFlow<Set<Int>> =
+        favoriteRepository.observeFavorites()
+            .map { list -> list.map { it.id }.toSet() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptySet()
+            )
+
     init {
         observeSearch()
+        restoreAndSaveQuery()
     }
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun restoreAndSaveQuery() {
+        viewModelScope.launch {
+            _searchQuery.value = preferencesRepository.lastSearchQuery.first()
+            searchQuery
+                .debounce(500)
+                .distinctUntilChanged()
+                .collectLatest { value ->
+                    preferencesRepository.saveLastSearchQuery(value)
+                }
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -62,6 +93,7 @@ class HomeViewModel(
                 }
         }
     }
+
     fun refresh() {
         val query = searchQuery.value
         viewModelScope.launch {
@@ -105,9 +137,15 @@ class HomeViewModel(
     }
 
     companion object {
-        fun factory(repository: StudentRepository): ViewModelProvider.Factory =
+        fun factory(
+            repository: StudentRepository,
+            preferencesRepository: UserPreferencesRepository,
+            favoriteRepository: FavoriteRepository
+        ): ViewModelProvider.Factory =
             viewModelFactory {
-                initializer { HomeViewModel(repository) }
+                initializer {
+                    HomeViewModel(repository, preferencesRepository, favoriteRepository)
+                }
             }
     }
 }

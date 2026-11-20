@@ -32,6 +32,7 @@ import androidx.compose.material3.CircularProgressIndicator
 @Composable
 fun DetailScreen(
     uiState: DetailUiState,
+    onToggleFavorite: () -> Unit,
     onOpenProfile: () -> Unit,
     onBack: () -> Unit,
     onRetry: () -> Unit
@@ -123,6 +124,19 @@ fun DetailScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            if (uiState.student != null) {
+                Button(
+                    onClick = onToggleFavorite,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        if (uiState.isFavorite) "Hapus dari Favorit"
+                        else "Simpan ke Favorit"
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             Button(
                 onClick = onOpenProfile,
