@@ -53,6 +53,7 @@ fun HomeScreen(
     onOpenProfile: () -> Unit,
     onOpenAbout: () -> Unit,
     onOpenFavorites: () -> Unit,
+    onOpenLocation: () -> Unit,
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
     onSearchQueryChange: (String) -> Unit
@@ -92,7 +93,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Kolom search: ikon Search + tombol Favorit di dalam kolom
             TextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChange,
@@ -129,7 +129,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Area konten: loading / error / data
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -191,7 +190,6 @@ fun HomeScreen(
                                                 Text("ID: ${student.id}")
                                             }
 
-                                            // "Foto" profil + badge bintang kalau favorit
                                             Box {
                                                 Box(
                                                     modifier = Modifier
@@ -237,28 +235,34 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
                     onClick = onOpenProfile,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.weight(1f),
                     border = BorderStroke(1.dp, Color.White)
                 ) {
-                    Text("Buka Profile", color = Color.White)
+                    Text("Profile", color = Color.White)
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedButton(
                     onClick = onOpenAbout,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.weight(1f),
                     border = BorderStroke(1.dp, Color.White)
                 ) {
-                    Text("Buka About", color = Color.White)
+                    Text("About", color = Color.White)
+                }
+
+                Button(
+                    onClick = onOpenLocation,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Lokasi")
                 }
             }
         }
